@@ -4,7 +4,6 @@
 var underscore = require('underscore'),
     generate = require('../lib/generate.js'),
     libsb;
-
 function logout() {
 	 libsb.emit("logout");
 }

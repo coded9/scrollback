@@ -66,9 +66,10 @@ var handlers = {
 					return m;
 				});
 				action.mentions = _.compact(mentions);
+				callback();
 			});
 		});
-		callback();
+
 	},
 	edit: function(action, callback) {
 		core.emit("getTexts", {id: uid(),ref: action.ref, to: action.room.id, session: internalSession}, function(err, actions) {

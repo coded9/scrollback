@@ -28,6 +28,7 @@ require('./ui/hide-scroll.js');
 require('./ui/user-area.js');
 require('./ui/chat.js');
 require('./ui/chat-area.js');
+require('./post-pc/post-pc.js')();
 
 // client uis
 require('./email/email-client.js');
