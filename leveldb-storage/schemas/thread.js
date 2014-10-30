@@ -35,9 +35,14 @@ module.exports = function (t) {
 
             if (query.time !== 0 && query.time) {
                 if (query.after) {
-                    dbQuery.gte.push(query.time);
+					if(query.room.guides && query.room.guides.clearTime && query.room.guides.clearTime > query.time) {
+						dbQuery.gte.push(query.room.guides.clearTime);
+					}else{
+						dbQuery.gte.push(query.time);	
+					}
                     if (query.after <= dbQuery.limit) dbQuery.limit = query.after;
                 } else if (query.before) {
+					if(query.room.guides && query.room.guides.clearTime) dbQuery.gte.push(query.room.guides.clearTime);
                     dbQuery.lte.push(query.time);
                     if (query.before <= dbQuery.limit) dbQuery.limit = query.before;
                 }
@@ -47,13 +52,14 @@ module.exports = function (t) {
                     return callback();
                 } else if (query.before) {
                     dbQuery.lte.push(0xffffffffffffffff);
+					if(query.room.guides && query.room.guides.clearTime) dbQuery.gte.push(query.room.guides.clearTime);
                     if (query.before < dbQuery.limit) dbQuery.limit = query.before;
                 }
             }
             if (query.before) {
                 dbQuery.reverse = true;
             }
-            console.log(dbQuery);
+			
             types.threads.get(dbQuery, function (err, results) {
                 if (err || !results) {
                     return callback();

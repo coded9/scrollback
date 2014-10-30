@@ -117,7 +117,7 @@ module.exports = function (types) {
                     if (query.after <= dbQuery.limit) dbQuery.limit = query.after;
                 } else if (query.before) {
                     dbQuery.lte.push(position);
-					dbQuery.gte.push(query.room.guides.clearTime);
+					if(query.room.guides && query.room.guides.clearTime) dbQuery.gte.push(query.room.guides.clearTime);
                     if (query.before <= dbQuery.limit) dbQuery.limit = query.before;
                 }
             } else {
