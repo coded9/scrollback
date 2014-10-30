@@ -155,6 +155,14 @@ $(function() {
 		next();
 	}, 100);
 
+	libsb.on("room-dn", function(action, next) {
+		if (action.room.guides.clearTime !== action.old.guides.clearTime) {
+			resetLog();
+			console.log(action);
+		}
+		next();
+	}, 100);
+
 	libsb.on("text-up", function(text, next) {
 		libsb.getOccupants(window.currentState.roomName, function(err, data) {
 			var occupants = [];

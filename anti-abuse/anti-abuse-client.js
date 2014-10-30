@@ -4,17 +4,19 @@
 var formField = require("../lib/formField.js");
 
 libsb.on("config-show", function(tabs, next) {
-	var room = tabs.room, lists;
+	var room = tabs.room;
 	if (!room.params) room.params = {};
 	if (!room.params.antiAbuse) room.params.antiAbuse = {};
-	if (!room.params.antiAbuse.block) room.params.antiAbuse.block = {english: false};
+	if (!room.params.antiAbuse.block) room.params.antiAbuse.block = {
+		english: false
+	};
 	if (!room.params.antiAbuse.customPhrases) room.params.antiAbuse.customPhrases = [];
 	if (!room.params.antiAbuse.spam) room.params.antiAbuse.spam = true;
 	var antiAbuse = room.params.antiAbuse;
 	var $div = $("<div>").append(
 		formField("Spam control", "toggle", "spam-control", antiAbuse.spam),
 		formField("Blocked words list", "check", "blocklists", [
-			["list-en-strict", "English abusive words", antiAbuse.block.english ]
+			["list-en-strict", "English abusive words", antiAbuse.block.english]
 		]),
 		formField("Custom blocked phrases/word", "area", "block-custom", antiAbuse.customPhrases.join("\n")),
 		formField("", "info", "spam-control-helper-text", "One phrase/word each line")
@@ -32,10 +34,10 @@ libsb.on("config-show", function(tabs, next) {
 }, 500);
 
 
-libsb.on("config-save", function(room, next){
+libsb.on("config-save", function(room, next) {
 	room.params.antiAbuse = {
 		spam: $("#spam-control").is(":checked"),
-		block:{
+		block: {
 			english: $("#list-en-strict").is(":checked")
 		},
 		customPhrases: $("#block-custom").val().split("\n").map(function(item) {
@@ -45,10 +47,10 @@ libsb.on("config-save", function(room, next){
 	next();
 }, 500);
 
-function hasLabel(label, labels){
+function hasLabel(label, labels) {
 
-	for(var i in labels){
-		if(i === label && labels[i] === 1){
+	for (var i in labels) {
+		if (i === label && labels[i] === 1) {
 			return true;
 		}
 	}
@@ -56,38 +58,65 @@ function hasLabel(label, labels){
 }
 
 libsb.on('text-menu', function(menu, next) {
-	if(menu.role !== "owner") return next();
+	if (menu.role !== "owner") return next();
 	var textObj;
-	libsb.emit('getTexts', {ref: menu.target.id.substring(5), to: currentState.roomName}, function(err, data){
+	libsb.emit('getTexts', {
+		ref: menu.target.id.substring(5),
+		to: currentState.roomName
+	}, function(err, data) {
 		textObj = data.results[0];
 		var target = menu.target;
 		var textMsg = $(target).find('.chat-message').text();
 
-		if(!hasLabel('hidden', textObj.labels)){
+		if (!hasLabel('hidden', textObj.labels)) {
 			menu.items.hidemessage = {
 				prio: 500,
 				text: 'Hide Message',
-				action: function(){
-					libsb.emit('edit-up', {to: currentState.roomName, labels: {'hidden': 1}, text: textMsg, ref: target.id.substring(5), cookie: false});
+				action: function() {
+					libsb.emit('edit-up', {
+						to: currentState.roomName,
+						labels: {
+							'hidden': 1
+						},
+						text: textMsg,
+						ref: target.id.substring(5),
+						cookie: false
+					});
 					$(target).addClass('chat-label-hidden');
 				}
 			};
-		} else{
+		} else {
 			menu.items.unhidemessage = {
 				prio: 500,
 				text: 'Unhide Message',
-				action: function(){
-					libsb.emit('edit-up', {to: currentState.roomName, labels: {'hidden': 0}, text: textMsg, ref: target.id.substring(5), cookie: false});
+				action: function() {
+					libsb.emit('edit-up', {
+						to: currentState.roomName,
+						labels: {
+							'hidden': 0
+						},
+						text: textMsg,
+						ref: target.id.substring(5),
+						cookie: false
+					});
 					$(target).removeClass('chat-label-hidden');
 				}
 			};
 		}
-		if(hasLabel('abusive', textObj.labels)){
+		if (hasLabel('abusive', textObj.labels)) {
 			menu.items.markasnotabusive = {
 				prio: 500,
 				text: 'Mark as not abusive',
-				action: function(){
-					libsb.emit('edit-up', {to: currentState.roomName, labels: {'abusive': 0}, text: textMsg, ref: target.id.substring(5), cookie: false});
+				action: function() {
+					libsb.emit('edit-up', {
+						to: currentState.roomName,
+						labels: {
+							'abusive': 0
+						},
+						text: textMsg,
+						ref: target.id.substring(5),
+						cookie: false
+					});
 				}
 			};
 		}

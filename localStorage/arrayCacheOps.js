@@ -25,7 +25,7 @@ function findLastTime(messages) {
 function applyUpdates(data, cacheName, endType) {
 	// applies edits till no more messages are left.
 	var pos;
-	data.forEach(function (msg) {
+	data.forEach(function(msg) {
 		pos = _this.cache[cacheName].find(endType, msg.time);
 		if (msg && _this.cache[cacheName].d[pos] && (msg.id === _this.cache[cacheName].d[pos].id)) {
 			_this.cache[cacheName].d[pos] = msg;
@@ -35,15 +35,18 @@ function applyUpdates(data, cacheName, endType) {
 
 module.exports = {
 	cache: {},
-	saveArrayCache: function (key) {
+	clear: function(key) {
+		spaceManager.clear(key);
+	},
+	saveArrayCache: function(key) {
 		spaceManager.set(key, this.cache[key].d);
 	},
-	loadArrayCache: function (key) {
+	loadArrayCache: function(key) {
 		var data = spaceManager.get(key);
 		if (data !== null) this.cache[key] = new ArrayCache(data);
 		else this.cache[key] = new ArrayCache([]);
 	},
-	start: function (endType, key, time, pos) {
+	start: function(endType, key, time, pos) {
 		/* Adds a result-start to the cache evaluating various conditions */
 		var rs = {
 			type: 'result-start',
@@ -71,7 +74,7 @@ module.exports = {
 		}
 		this.saveArrayCache(key);
 	},
-	end: function (endType, key, time, pos) {
+	end: function(endType, key, time, pos) {
 		/* Adds a result-end to the cache evaluating various conditions */
 		var re = {
 			type: 'result-end',
@@ -109,17 +112,17 @@ module.exports = {
 		}
 		this.saveArrayCache(key);
 	},
-	generateLSKey: function () {
+	generateLSKey: function() {
 		var args = Array.prototype.slice.call(arguments, 0);
 		if (!args) {
 			return;
 		}
-		var argumentsLC = args.map(function (val) {
+		var argumentsLC = args.map(function(val) {
 			if (typeof val == "string") return val.toLowerCase();
 		});
 		return argumentsLC.join('_');
 	},
-	updateArrayCache: function (key, roomName, endType) {
+	updateArrayCache: function(key, roomName, endType) {
 		var msgs = this.cache[key].d;
 		//var msgs = JSON.parse(localStorage[key]);
 		var lastTime = findLastTime(msgs);
@@ -130,7 +133,7 @@ module.exports = {
 			to: roomName,
 			updateTime: lastTime,
 			after: 256
-		}, function (err, data) {
+		}, function(err, data) {
 			applyUpdates(data.results, key, endType);
 		});
 	}

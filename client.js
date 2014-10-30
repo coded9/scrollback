@@ -89,5 +89,6 @@ require('./ui/room-notifications.js');
 require('./ui/home-feed.js');
 require('./ui/google-analytics.js');
 require('./ui/workarounds.js');
+require('./ui/clear-room.js')(libsb);
 
 require('./client-init/boot.js')(libsb);

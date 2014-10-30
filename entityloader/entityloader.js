@@ -98,7 +98,11 @@ var handlers = {
 		});
 	},
 	admit: loadVictim,
-	expel: loadVictim
+	expel: loadVictim,
+	room: function(action, callback) {
+		if(!action.room.guides.clearTime || action.room.guides.clearTime<action.old.guides.clearTime) action.room.guides.clearTime = action.old.guides.clearTime;
+		return callback();
+	}
 };
 
 function loadVictim(action, callback) {

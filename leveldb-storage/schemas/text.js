@@ -109,11 +109,15 @@ module.exports = function (types) {
 
             if (position) {
                 if (query.after) {
-                    dbQuery.gte.push(position);
+					if(query.room.guides && query.room.guides.clearTime && query.room.guides.clearTime > position) {
+						dbQuery.gte.push(query.room.guides.clearTime);
+					}else{
+						dbQuery.gte.push(position);	
+					}
                     if (query.after <= dbQuery.limit) dbQuery.limit = query.after;
                 } else if (query.before) {
                     dbQuery.lte.push(position);
-                    dbQuery.reverse = true;
+					dbQuery.gte.push(query.room.guides.clearTime);
                     if (query.before <= dbQuery.limit) dbQuery.limit = query.before;
                 }
             } else {
@@ -121,6 +125,9 @@ module.exports = function (types) {
                     query.results = [];
                     return cb();
                 } else if (query.before) {
+					if(query.room.guides && query.room.guides.clearTime) {
+						dbQuery.gte.push(query.room.guides.clearTime);
+					}
                     dbQuery.lte.push(0xffffffffffffffff);
                     if (query.before <= dbQuery.limit) dbQuery.limit = query.before;
                 }
@@ -129,7 +136,6 @@ module.exports = function (types) {
             if (query.before) {
                 dbQuery.reverse = true;
             }
-
             texts.get(dbQuery, function (err, data) {
                 if (err) return cb(err);
                 if (dbQuery.reverse) data = data.reverse();

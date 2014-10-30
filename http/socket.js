@@ -287,12 +287,13 @@ exports.initCore = function(c) {
 	});
 };
 
-function censorAction(action, filter) {
-	var outAction = {},
-		i, j;
+
+function cloneObject(action) {
+	var i, outAction = {},
+		j;
 	for (i in action) {
 		if (action.hasOwnProperty(i)) {
-			if (i == "room" || i == "user") {
+			if (i == "room" || i == "user" || i == "old") {
 				outAction[i] = {};
 				for (j in action[i]) {
 					if (action[i].hasOwnProperty(j)) {
@@ -304,6 +305,26 @@ function censorAction(action, filter) {
 			}
 		}
 	}
+
+	return outAction;
+}
+
+
+function censorActionForOld(action) {
+	if (action.type == "edit") {
+		delete action.old.session;
+	} else if ((action.type == "user" || action.type == "room") && action.old) {
+		delete action.old.params;
+		delete action.old.identities;
+	}
+	return action;
+}
+
+
+function censorAction(action, filter) {
+	var outAction;
+
+	outAction = cloneObject(action);
 	if (outAction.origin) delete outAction.origin;
 	if (outAction.eventStartTime) delete outAction.eventStartTime; //TODO: copy properties
 	if (filter == 'both' || filter == 'user') {
@@ -352,7 +373,7 @@ function emit(action, callback) {
 
 	outAction = censorAction(action, "both");
 	myAction = censorAction(action, "room");
-
+	outAction = censorActionForOld(outAction);
 	if (rConns[action.to]) {
 		rConns[action.to].forEach(function(e) {
 			if (e.session == action.session) {
