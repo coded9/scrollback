@@ -5,7 +5,7 @@
 		validate = require("../lib/validate.js");
 
 	document.addEventListener("readystatechange", function() {
-		var container, iosHack, range, scrollTimer, reposition;
+		var container, iosHack, scrollTimer, reposition;
 
 		if (document.readyState === "complete") {
 			// Add to iframe url: embed={minimize,path}
@@ -105,16 +105,12 @@
 			// WebKit hack :(
 			iosHack.appendChild(document.createTextNode(""));
 
-			range = document.createRange();
-			range.selectNodeContents(iosHack);
-						
-			reposition = function () {
+			reposition = function() {
 				var winHeight = parseInt(window.innerHeight),
 					scrollTop = parseInt(document.body.scrollTop),
 					topOffset = winHeight + scrollTop;
 
-				range.deleteContents();
-
+				iosHack.innerHTML = "";
 				iosHack.appendChild(document.createTextNode(
 					".scrollback-stream.scrollback-ios {" +
 					"top:" + (topOffset - parseInt(window.getComputedStyle(iframe).height)) + "px;" +
@@ -127,7 +123,10 @@
 					"}"
 				));
 			};
-			
+
+			// Reposition on page load
+			reposition();
+
 			window.addEventListener("message", function(e) {
 				if (e.origin === host && e.data === "unfocused") {
 					reposition();
@@ -142,7 +141,7 @@
 				if (iframe.classList.contains("scrollback-focused")) {
 					return;
 				}*/
-				
+
 				scrollTimer = setTimeout(reposition, 150);
 			});
 		}
