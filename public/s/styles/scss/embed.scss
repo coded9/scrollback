@@ -38,7 +38,12 @@ $bar-height: 49px !default;
 		&.scrollback-ios {
 			position: absolute;
 			bottom: auto;
-
+			
+			&.scrollback-focused {
+				heigth: 100%;
+				width: 100%;
+			}
+			
 			&.scrollback-minimized { bottom: auto; }
 		}
 	}

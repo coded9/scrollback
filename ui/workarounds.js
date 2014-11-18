@@ -10,5 +10,11 @@
 		$("body").css({
 			cursor: "pointer"
 		});
+		
+/*		$("input, textarea, [contenteditable]").on("focus", function() {
+			setTimeout(function() {
+				$(this).get(0).scrollIntoView(true);
+			}, 150);
+		});*/
 	}
 }());

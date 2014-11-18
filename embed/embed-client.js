@@ -34,6 +34,12 @@ function sendDomainChallenge() {
 			}
 		}
 	}, 1000);
+	
+	$("input, textarea, [contenteditable]").on("focus", function(){
+		window.parent.postMessage("focused", parentHost);
+	}).on("blur", function(){
+		window.parent.postMessage("unfocused", parentHost);
+	});
 }
 
 function verifyDomainResponse(data) {

@@ -5,7 +5,7 @@
 		validate = require("../lib/validate.js");
 
 	document.addEventListener("readystatechange", function() {
-		var container, iosHack, range, scrollTimer;
+		var container, iosHack, range, scrollTimer, reposition;
 
 		if (document.readyState === "complete") {
 			// Add to iframe url: embed={minimize,path}
@@ -64,9 +64,12 @@
 
 				if (e.origin === host) {
 					var minReg = /\bscrollback-minimized\b/;
-
-					if (e.data === "minimize" && !minReg.test(iframe.className)) {
-						iframe.className = iframe.className + " scrollback-minimized";
+					if (e.data === "focused") {
+						iframe.classList.add("scrollback-focused");
+					} else if (e.data === "unfocused") {
+						iframe.classList.remove("scrollback-focused");
+					} else if (e.data === "minimize" && !minReg.test(iframe.className)) {
+						iframe.className += " scrollback-minimized";
 					} else if (e.data === "maximize") {
 						iframe.className = iframe.className.replace(minReg, "").trim();
 					} else {
@@ -104,26 +107,43 @@
 
 			range = document.createRange();
 			range.selectNodeContents(iosHack);
+						
+			reposition = function () {
+				var winHeight = parseInt(window.innerHeight),
+					scrollTop = parseInt(document.body.scrollTop),
+					topOffset = winHeight + scrollTop;
+
+				range.deleteContents();
+
+				iosHack.appendChild(document.createTextNode(
+					".scrollback-stream.scrollback-ios {" +
+					"top:" + (topOffset - parseInt(window.getComputedStyle(iframe).height)) + "px;" +
+					"}" +
+					".scrollback-stream.scrollback-ios.scrollback-focused {" +
+					"top:" + scrollTop + "px;" +
+					"}" +
+					".scrollback-stream.scrollback-ios.scrollback-minimized {" +
+					"top:" + (topOffset - 49) + "px;" +
+					"}"
+				));
+			};
+			
+			window.addEventListener("message", function(e) {
+				if (e.origin === host && e.data === "unfocused") {
+					reposition();
+				}
+			}, false);
 
 			window.addEventListener("scroll", function() {
 				if (scrollTimer) {
 					clearTimeout(scrollTimer);
 				}
-
-				scrollTimer = setTimeout(function() {
-					var topOffset = parseInt(window.innerHeight) + parseInt(document.body.scrollTop);
-
-					range.deleteContents();
-
-					iosHack.appendChild(document.createTextNode(
-						".scrollback-stream.scrollback-ios {" +
-						"top:" + (topOffset - parseInt(window.getComputedStyle(iframe).height)) + "px;" +
-						"}" +
-						".scrollback-stream.scrollback-ios.scrollback-minimized {" +
-						"top:" + (topOffset - 49) + "px;" +
-						"}"
-					));
-				}, 150);
+				/*
+				if (iframe.classList.contains("scrollback-focused")) {
+					return;
+				}*/
+				
+				scrollTimer = setTimeout(reposition, 150);
 			});
 		}
 	}, false);
