@@ -1,11 +1,11 @@
-/* jslint browser: true, indent: 4, regexp: true  */
+/* jslint browser: true, indent: 4, regexp: true */
 
 (function() {
 	var config = require("../client-config.js"),
 		validate = require("../lib/validate.js");
 
 	document.addEventListener("readystatechange", function() {
-		var container;
+		var container, iosHack, range, scrollTimer;
 
 		if (document.readyState === "complete") {
 			// Add to iframe url: embed={minimize,path}
@@ -80,6 +80,51 @@
 					}
 				}
 			}, false);
+
+			// iOS hacks
+			// Danger below, stay away
+			if (!(navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+				navigator.userAgent.match(/AppleWebKit/) &&
+				navigator.userAgent.match(/Safari/))) {
+				return;
+			}
+
+			iframe.className += " scrollback-ios";
+
+			// Create the <style> tag
+			iosHack = document.createElement("style");
+			iosHack.rel = "stylesheet";
+			iosHack.type = "text/css";
+
+			// Add the <style> element to the page
+			document.head.appendChild(iosHack);
+
+			// WebKit hack :(
+			iosHack.appendChild(document.createTextNode(""));
+
+			range = document.createRange();
+			range.selectNodeContents(iosHack);
+
+			window.addEventListener("scroll", function() {
+				if (scrollTimer) {
+					clearTimeout(scrollTimer);
+				}
+
+				scrollTimer = setTimeout(function() {
+					var topOffset = parseInt(window.innerHeight) + parseInt(document.body.scrollTop);
+
+					range.deleteContents();
+
+					iosHack.appendChild(document.createTextNode(
+						".scrollback-stream.scrollback-ios {" +
+						"top:" + (topOffset - parseInt(window.getComputedStyle(iframe).height)) + "px;" +
+						"}" +
+						".scrollback-stream.scrollback-ios.scrollback-minimized {" +
+						"top:" + (topOffset - 49) + "px;" +
+						"}"
+					));
+				}, 150);
+			});
 		}
 	}, false);
 })();
