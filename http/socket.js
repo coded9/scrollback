@@ -121,7 +121,7 @@ sock.on('connection', function(socket) {
 				return;
 			}
 			if (data.type == 'room') {
-				/* this is need because we dont have the connection object in the
+				/* this is needed because we dont have the connection object in the
 				rconn until the room can be setup and a back message is sent.*/
 				if (!data.old || !data.old.id) conn.send(data);
 				// return;

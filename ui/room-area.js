@@ -205,6 +205,12 @@ $(function() {
 		next();
 	}, 500);
 
+	$(document).on("click", ".room-close", function(e) {
+		var room = $(this).closest(".room-item").data("room");
+		libsb.leave(room);
+		e.stopImmediatePropagation();
+	});
+	
 	$(document).on("click", "[data-room]", function() {
 		var room = $(this).attr("data-room");
 
