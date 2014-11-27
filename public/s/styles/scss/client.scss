@@ -156,6 +156,11 @@ body {
 
     &.search-term { background: url(../../img/client/icons/search-light.svg) no-repeat 90% center; }
 
+	.room-close{
+		position: absolute;
+		right: 0;
+		padding-right: 1.5em;
+	}
     .room-item-unread-count {
         @extend %appear;
 

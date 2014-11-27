@@ -93,8 +93,10 @@ sock.on('connection', function(socket) {
 				return;
 			}
 		}
+		log.d("Emitting event "+ d.type+ " ", d);
 		core.emit(d.type, d, function(err, data) {
 			var e, action;
+			log.d("Callback of event "+ d.type+ " Error: ", err,"\nAction: ", data || null);
 			if (err) {
 				e = {
 					type: 'error',
@@ -235,21 +237,24 @@ function storeBack(conn, back) {
 	if (conn.listeningTo.indexOf(back.to) < 0) {
 		conn.listeningTo.push(back.to);
 	}
-
-	//    console.log("LOG:"+ back.from +" got back from :"+back.to);
 }
-
 
 function storeAway(conn, away) {
 	var index;
-	delete urConns[away.from + ":" + away.to];
 	if (sConns[away.session] && !sConns[away.session].length) {
 		delete sConns[away.session];
 	}
 	if (uConns[away.session] && !uConns[away.session].length) {
 		delete uConns[away.session];
 	}
-	if (urConns[away.from + ":" + away.to]) delete urConns[away.from + ":" + away.to];
+	
+	if (urConns[away.from + ":" + away.to]) {
+		urConns[away.from + ":" + away.to].forEach(function(c) {
+			var index = rConns[away.to].indexOf(c);
+			rConns[away.to].splice(index, 1);
+		});
+		delete urConns[away.from + ":" + away.to];
+	}
 	if (conn.listeningTo) {
 		index = conn.listeningTo.indexOf(away.to);
 		if (index >= 0) conn.listeningTo.splice(index, 1);

@@ -11,7 +11,7 @@ roomEl.render = function(roomObj, $el) {
 
 	$el.find(".room-name").text(id);
 	$el.attr("data-room", id);
-
+	if(!roomObj.role) $el.addClass("guest");
 	if (window.currentState.roomName === id) {
 		$(".room-item.current").removeClass("current");
 		$el.addClass("current");

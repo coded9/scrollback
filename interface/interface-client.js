@@ -212,6 +212,7 @@ function recvAway(away, next) {
 			return room;
 		}
 	});
+	if(!libsb.occupantOf.length && /^guest-/.test(libsb.user.id)) libsb.emit("logout");
     next();
 }
 

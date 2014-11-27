@@ -76,31 +76,15 @@ $(function() {
 		$noRoomCreateButton = $("#noroom-view-create"),
 		roomArea = {
 			add: function(roomObj) {
-				var done = false;
-
-				if (window.currentState.mode === "home") {
-					done = homeFeedMine.add(roomObj);
-				} else {
-					done = roomList.add(roomObj);
-				}
-
-				if (done) {
-					enter(roomObj.id);
-				}
+				homeFeedMine.add(roomObj);
+				roomList.add(roomObj);
+				enter(roomObj.id);
 			},
 
 			remove: function(roomObj) {
-				var done = false;
-
-				if (window.currentState.mode === "home") {
-					done = homeFeedMine.remove(roomObj);
-				} else {
-					done = roomList.remove(roomObj);
-				}
-
-				if (done) {
-					leave(roomObj.id);
-				}
+				homeFeedMine.remove(roomObj);
+				roomList.remove(roomObj);
+				leave(roomObj.id);
 			},
 
 			clear: function() {
@@ -153,14 +137,14 @@ $(function() {
 			});
 		}
 
-		if (libsb.occupantOf) {
-			libsb.occupantOf.forEach(function(roomObj) {
+		if (libsb.memberOf) {
+			libsb.memberOf.forEach(function(roomObj) {
 				roomArea.add(roomObj);
 			});
 		}
 
-		if (libsb.memberOf) {
-			libsb.memberOf.forEach(function(roomObj) {
+		if (libsb.occupantOf) {
+			libsb.occupantOf.forEach(function(roomObj) {
 				roomArea.add(roomObj);
 			});
 		}
@@ -191,8 +175,13 @@ $(function() {
 		}
 
 		next();
-	}, 500);
-
+	}, 400);
+	libsb.on("away-dn", function(action ,next){
+		if(action.from === libsb.user.id) {
+			updateMyRooms();
+		}
+		next();
+	}, 100);
 	libsb.on("init-dn", function(init, next) {
 		updateMyRooms();
 		updateFeaturedRooms();
@@ -206,11 +195,38 @@ $(function() {
 	}, 500);
 
 	$(document).on("click", ".room-close", function(e) {
-		var room = $(this).closest(".room-item").data("room");
-		libsb.leave(room);
+		var self = $(this), navigate = {},
+		roomEl = self.closest(".room-item"), room = roomEl.data("room");
+		delete roomList[room];
+		if(room === currentState.roomName) {
+			if(roomEl.next().length) {
+				navigate.roomName = $(roomEl.next()[0]).data("room");
+			} else if(roomEl.prev().length) {
+				navigate.roomName = $(roomEl.prev()[0]).data("room");
+			}
+			
+			navigate.source = "room-area";
+		}
+		libsb.getRooms({ref:room}, function(err, query){
+			if(!err && query.results && query.results[0]){
+				roomArea.remove(query.results[0]);
+				
+				
+				libsb.leave(room, function(){
+					if (navigate.roomName) {
+						setCurrentRoom(navigate.roomName);
+						libsb.emit("navigate", navigate);
+					} else {
+						if(!/guest-/.test(libsb.user.id)) libsb.emit("navigate", {mode: "home", roomName: null});
+					}
+				});
+			}
+		});
+		
+		e.preventDefault();
 		e.stopImmediatePropagation();
 	});
-	
+
 	$(document).on("click", "[data-room]", function() {
 		var room = $(this).attr("data-room");
 
@@ -298,13 +314,13 @@ $(function() {
 					}
 				});
 			};
-		
+
 		$createRoomEntry.on("change input paste", function() {
 			$.popover("dismiss");
 
 			$(this).removeClass("error");
 		});
-		
+
 		if (typeof roomName === "string") {
 			$createRoomEntry.val(roomName);
 		}
@@ -339,7 +355,7 @@ $(function() {
 	function noRoomHandler() {
 		newRoomHandler(currentState.roomName);
 	}
-	
+
 	// Handle create new room
 	$noRoomCreateButton.on("click", noRoomHandler);
 	$createRoomButton.on("click", newRoomHandler);
@@ -355,7 +371,7 @@ libsb.on('room-dn', function(room, next) {
 				roomName: room.room.id
 			});
 		}
-		next();	
+		next();
 	}, 0);
 }, 100);
 
