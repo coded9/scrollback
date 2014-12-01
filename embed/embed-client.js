@@ -1,5 +1,5 @@
 /* jshint browser: true */
-/* global $*/
+/* global $, currentState*/
 
 var Color = require("../lib/color.js"),
 	parseURL = require("../lib/parseURL.js"),
@@ -305,6 +305,14 @@ module.exports = function(libsb) {
 			queue.push(processInit);
 		}
 	}, 500);
-
+	libsb.on("away-dn", function(away, next) {
+		var text;
+		if(currentState.embed && away.from === libsb.user.id && away.to === currentState.roomName) {
+			var $signoutDialog = $("<div>").html("You are not in the room:").modal({
+				dismiss: false
+			});
+		}
+		next();
+	}, 100);
 	libsb.on("navigate", toastChange, 500);
 };
