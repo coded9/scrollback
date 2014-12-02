@@ -306,13 +306,20 @@ module.exports = function(libsb) {
 		}
 	}, 500);
 	libsb.on("away-dn", function(away, next) {
-		var text;
 		if(currentState.embed && away.from === libsb.user.id && away.to === currentState.roomName) {
-			var $signoutDialog = $("<div>").html("You are not in the room:").modal({
-				dismiss: false
-			});
+			libsb.emit("navigate", {dialog: "left-room"});
 		}
 		next();
 	}, 100);
 	libsb.on("navigate", toastChange, 500);
+	libsb.on("left-room-dialog", function(dialog, next) {
+		dialog.title = "You left the room";
+		dialog.action = {
+			text: "go back to room",
+			action: function(){
+				window.location.reload();
+			}
+		};
+		next();
+	}, 1000);
 };
