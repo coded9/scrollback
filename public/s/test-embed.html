@@ -31,9 +31,9 @@
 			opts.form = opts.form || 'toast';
 
 			try {
-				if(opts.minimize) opts.minimize = JSON.parse(opts.minimize);
+				opts.minimize = true;
 			} catch(e) {}
-
+			
 			window.scrollback = opts;
 
 			console.log(window.scrollback);

@@ -317,7 +317,11 @@ module.exports = function(libsb) {
 		dialog.action = {
 			text: "go back to room",
 			action: function(){
-				window.location.reload();
+				libsb.emit("navigate", {
+					dialog: null
+				}, function(){
+					window.location.reload();	
+				});
 			}
 		};
 		next();
