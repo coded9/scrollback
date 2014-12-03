@@ -155,27 +155,44 @@ body {
     }
 
     &.search-term { background: url(../../img/client/icons/search-light.svg) no-repeat 90% center; }
+}
 
-	.room-close{
-		position: absolute;
-		right: 0;
-		padding-right: 1.5em;
-	}
-    .room-item-unread-count {
-        @extend %appear;
+.room-item-unread-count {
+    @extend %appear;
 
-        float: right;
-        min-width: 2em;
-        text-align: center;
-        font-size: .8em;
-        font-weight: 700;
-        background-color: $accent-color;
-        color: $light-color;
-        border-radius: $roundness;
+    float: right;
+    min-width: 2em;
+    text-align: center;
+    font-size: .8em;
+    font-weight: 700;
+    background-color: $accent-color;
+    color: $light-color;
+    border-radius: $roundness;
 
-        &:empty { display: none; }
+    &:empty { display: none; }
 
-        &.mentioned { background-color: $error-color; }
+    &.mentioned { background-color: $error-color; }
+}
+
+.room-close {
+    @include transition(.3s ease-out);
+    @include opacity(.5);
+
+    position: absolute;
+    top: 0;
+    top: 0;
+    right: .5em;
+    margin: .75em;
+    padding: .5em .5em .2em .5em;
+    border-radius: 50%;
+
+    &:before { @include asset-content("close"); }
+
+    &:hover {
+        @include transform(rotate(90deg));
+        @include opacity(1);
+
+        background-color: $error-color;
     }
 }
 
