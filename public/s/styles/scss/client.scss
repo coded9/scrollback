@@ -121,6 +121,7 @@ body {
 .room-item {
     @extend %snappy;
 
+	position: relative;
     display: block;
     padding: 1em;
     font-weight: 700;
@@ -138,7 +139,6 @@ body {
     }
 
     &.current {
-        position: relative;
         background-color: rgba(0,0,0,.1);
 
         /* show a little triangle next to the current room */
@@ -179,7 +179,6 @@ body {
     @include opacity(.5);
 
     position: absolute;
-    top: 0;
     top: 0;
     right: .5em;
     margin: .75em;
