@@ -192,7 +192,7 @@ body {
         @include transform(rotate(90deg));
         @include opacity(1);
 
-        background-color: $error-color;
+        background-color: fade-out($light-color, .7);
     }
 }
 
